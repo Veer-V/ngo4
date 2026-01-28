@@ -19,11 +19,15 @@ export default function DonatePage() {
     // For this prototype, let's assume Project ID 1 exists.
 
     // In a real app, you'd use a subgraph or loop through IDs 1..projectCounter
-    const { data: project1, isLoading } = useReadContract({
+    const { data: project1, isLoading, error } = useReadContract({
         contract,
         method: "function projects(uint256) view returns (uint256 id, string name, address wallet, uint256 totalFunds, uint256 currentBalance, uint256 releasedFunds, uint256 milestoneCount)",
         params: [1n]
     });
+
+    if (error) {
+        console.error("Read Error:", error);
+    }
 
     const handleDonate = () => {
         if (!selectedProject || !amount || !account) return;
@@ -135,6 +139,11 @@ export default function DonatePage() {
                     ) : (
                         <div className="col-span-2 text-center py-12 text-gray-500">
                             <p>No projects found. Please deploy the contract and create a project (ID: 1).</p>
+                            {error && (
+                                <p className="text-red-500 text-sm mt-2">
+                                    Debug Error: {error.message}
+                                </p>
+                            )}
                         </div>
                     )}
                 </div>
