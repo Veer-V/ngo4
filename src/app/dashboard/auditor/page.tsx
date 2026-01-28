@@ -12,10 +12,20 @@ const projects = [
     { id: 2, name: "Clean Water Initiative", total: 25000, released: 5000, nextMilestone: "Equipment Procurement", requestAmount: 8000 },
 ];
 
+import { useReadContract } from "thirdweb/react";
+import { toWei, fromWei } from "thirdweb";
+
 export default function AuditorPage() {
     const { mutate: sendTransaction, isPending } = useSendTransaction();
     const account = useActiveAccount();
     const [processingId, setProcessingId] = useState<number | null>(null);
+
+    // Fetch Project #1 (Demo)
+    const { data: project, isLoading } = useReadContract({
+        contract,
+        method: "function projects(uint256) view returns (uint256 id, string name, address wallet, uint256 totalFunds, uint256 currentBalance, uint256 releasedFunds, uint256 milestoneCount)",
+        params: [1n]
+    });
 
     const handleApprove = (projectId: number) => {
         if (!account) {
@@ -24,12 +34,14 @@ export default function AuditorPage() {
         }
         setProcessingId(projectId);
 
-        // In real app, we pass the milestone index and percentage
+        // Example: Release 1 ETH (or 20% of funds, logic up to auditor)
+        // For prototype, we'll just release 1 ETH fixed for now
+        const amountToRelease = "1";
+
         const transaction = prepareContractCall({
             contract,
-            method: "function releaseMilestone(uint256 projectId, uint256 milestoneIndex, uint256 releasePercent)",
-            // Mocking: ProjectId, Milestone 1, 20% release
-            params: [BigInt(projectId), BigInt(1), BigInt(20)]
+            method: "function releaseMilestone(uint256 projectId, uint256 milestoneIndex, uint256 amountToRelease)",
+            params: [BigInt(projectId), BigInt(1), toWei(amountToRelease)]
         });
 
         sendTransaction(transaction, {
@@ -39,10 +51,27 @@ export default function AuditorPage() {
             },
             onError: (err) => {
                 console.error(err);
+                alert("Failed to release funds. Check if balance is sufficient.");
                 setProcessingId(null);
             }
         });
     };
+
+    if (isLoading) {
+        return <div className="p-12 text-center text-emerald-400">Loading projects...</div>;
+    }
+
+    // Convert Contract Data to UI Format
+    // Note: project is an array: [id, name, wallet, totalFunds, currentBalance, releasedFunds, milestoneCount]
+    const pData = project && project[0] !== 0n ? {
+        id: Number(project[0]),
+        name: project[1],
+        total: project[3],
+        balance: project[4],
+        released: project[5],
+        nextMilestone: "Milestone Release",
+        requestAmount: "1 ETH"
+    } : null;
 
     return (
         <div className="space-y-6">
@@ -52,33 +81,34 @@ export default function AuditorPage() {
             </div>
 
             <div className="grid gap-6">
-                {projects.map((project) => (
-                    <div key={project.id} className="bg-card border border-border rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                {pData ? (
+                    <div className="bg-card border border-border rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="flex-1 space-y-2">
                             <div className="flex items-center gap-3">
-                                <h3 className="text-xl font-semibold text-white">{project.name}</h3>
+                                <h3 className="text-xl font-semibold text-white">{pData.name}</h3>
                                 <span className="bg-orange-500/10 text-orange-400 text-xs px-2 py-0.5 rounded border border-orange-500/20">Action Required</span>
                             </div>
 
                             <div className="flex gap-8 text-sm text-gray-400">
-                                <p>Total Fund: <span className="text-white font-mono">${project.total.toLocaleString()}</span></p>
-                                <p>Released: <span className="text-emerald-400 font-mono">${project.released.toLocaleString()}</span></p>
+                                <p>Target: <span className="text-white font-mono">{fromWei(pData.total)} ETH</span></p>
+                                <p>Escrow Balance: <span className="text-emerald-400 font-mono">{fromWei(pData.balance)} ETH</span></p>
+                                <p>Released: <span className="text-blue-400 font-mono">{fromWei(pData.released)} ETH</span></p>
                             </div>
 
                             <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-800 mt-2">
-                                <p className="text-sm text-gray-300 font-medium">Milestone Request: <span className="text-white">{project.nextMilestone}</span></p>
+                                <p className="text-sm text-gray-300 font-medium">Milestone Request: <span className="text-white">{pData.nextMilestone}</span></p>
                                 <p className="text-xs text-gray-500 mt-1">Evidence: verified by IoT Sensor #8841 (GPS: 12.97, 77.59)</p>
-                                <p className="text-sm text-emerald-400 font-bold mt-2">Unlocking: ${project.requestAmount.toLocaleString()}</p>
+                                <p className="text-sm text-emerald-400 font-bold mt-2">Unlocking: {pData.requestAmount}</p>
                             </div>
                         </div>
 
                         <div className="flex flex-col gap-3 w-full md:w-auto">
                             <button
-                                onClick={() => handleApprove(project.id)}
+                                onClick={() => handleApprove(pData.id)}
                                 disabled={isPending}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all"
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                             >
-                                {processingId === project.id && isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
+                                {processingId === pData.id && isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
                                 Approve & Release
                             </button>
                             <button className="bg-transparent border border-destructive/50 text-destructive hover:bg-destructive/10 px-6 py-2 rounded-lg text-sm font-medium transition-colors">
@@ -86,7 +116,9 @@ export default function AuditorPage() {
                             </button>
                         </div>
                     </div>
-                ))}
+                ) : (
+                    <p className="text-gray-500">No active projects found.</p>
+                )}
             </div>
         </div>
     );

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ConnectButton } from "thirdweb/react";
 import { client } from "@/lib/client";
-import { LayoutDashboard, FileText, Activity, ShieldCheck, Menu } from "lucide-react";
+import { LayoutDashboard, FileText, Activity, ShieldCheck, Menu, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -12,6 +12,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     const navItems = [
         { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+        { name: "Donate", icon: Heart, href: "/dashboard/donate" },
         { name: "Documents", icon: FileText, href: "/dashboard/documents" },
         { name: "Impact Tracker", icon: Activity, href: "/dashboard/tracker" },
         { name: "Auditor Panel", icon: ShieldCheck, href: "/dashboard/auditor" },
