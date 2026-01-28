@@ -13,7 +13,7 @@ const projects = [
 ];
 
 import { useReadContract } from "thirdweb/react";
-import { toWei, fromWei } from "thirdweb";
+import { toWei, toEther } from "thirdweb";
 
 export default function AuditorPage() {
     const { mutate: sendTransaction, isPending } = useSendTransaction();
@@ -90,9 +90,9 @@ export default function AuditorPage() {
                             </div>
 
                             <div className="flex gap-8 text-sm text-gray-400">
-                                <p>Target: <span className="text-white font-mono">{fromWei(pData.total)} ETH</span></p>
-                                <p>Escrow Balance: <span className="text-emerald-400 font-mono">{fromWei(pData.balance)} ETH</span></p>
-                                <p>Released: <span className="text-blue-400 font-mono">{fromWei(pData.released)} ETH</span></p>
+                                <p>Target: <span className="text-white font-mono">{toEther(pData.total)} ETH</span></p>
+                                <p>Escrow Balance: <span className="text-emerald-400 font-mono">{toEther(pData.balance)} ETH</span></p>
+                                <p>Released: <span className="text-blue-400 font-mono">{toEther(pData.released)} ETH</span></p>
                             </div>
 
                             <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-800 mt-2">
