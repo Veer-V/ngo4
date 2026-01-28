@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { prepareContractCall } from "thirdweb";
-import { useSendTransaction } from "thirdweb/react";
+import { useSendTransaction, useActiveAccount } from "thirdweb/react";
 import { contract } from "@/lib/contract";
 
 // Mock Projects
@@ -14,9 +14,14 @@ const projects = [
 
 export default function AuditorPage() {
     const { mutate: sendTransaction, isPending } = useSendTransaction();
+    const account = useActiveAccount();
     const [processingId, setProcessingId] = useState<number | null>(null);
 
     const handleApprove = (projectId: number) => {
+        if (!account) {
+            alert("Please connect your wallet first!");
+            return;
+        }
         setProcessingId(projectId);
 
         // In real app, we pass the milestone index and percentage
