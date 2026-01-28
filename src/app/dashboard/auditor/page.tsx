@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import { prepareContractCall } from "thirdweb";
 import { useSendTransaction } from "thirdweb/react";
 import { contract } from "@/lib/contract";
@@ -16,7 +16,7 @@ export default function AuditorPage() {
     const { mutate: sendTransaction, isPending } = useSendTransaction();
     const [processingId, setProcessingId] = useState<number | null>(null);
 
-    const handleApprove = (projectId: number, amount: number) => {
+    const handleApprove = (projectId: number) => {
         setProcessingId(projectId);
 
         // In real app, we pass the milestone index and percentage
@@ -69,7 +69,7 @@ export default function AuditorPage() {
 
                         <div className="flex flex-col gap-3 w-full md:w-auto">
                             <button
-                                onClick={() => handleApprove(project.id, project.requestAmount)}
+                                onClick={() => handleApprove(project.id)}
                                 disabled={isPending}
                                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all"
                             >

@@ -36,6 +36,19 @@ npm run dev
 ```
 Visit [http://localhost:3000/dashboard](http://localhost:3000/dashboard).
 
+### 5. Testing & Verification
+To run the automated test suite:
+```bash
+npm test
+```
+
+### 6. Production Build
+To build and start the application for production:
+```bash
+npm run build
+npm start
+```
+
 ## 🛠️ How to "See" the Tokens
 1.  **Minting**: Go to **Dashboard** -> Upload a file -> Click "Secure & Mint". This creates the token on-chain.
 2.  **Viewing**: Go to **Documents** (`/dashboard/documents`). Your soulbound tokens will appear here.
