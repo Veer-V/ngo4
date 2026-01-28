@@ -12,13 +12,10 @@ ChainTrust is a blockchain-based platform ensuring transparent, tamper-proof tra
 The logic lives in `contracts/ImpactPassport.sol`. To deploy it to the blockchain:
 
 ```bash
-# From project root
-npx thirdweb deploy
-```
-1.  Select `contracts/ImpactPassport.sol`.
-2.  Follow the link to the Thirdweb Dashboard.
-3.  Connect MetaMask and click **Deploy Now**.
-4.  **COPY the Contract Address** after deployment.
+#PS C:\Users\Osama\OneDrive\Documents\Trust> npx thirdweb deploy
+Please include the -k flag with your secret key, learn more: https://portal.thirdweb.com/knowledge-base/onchain-common-errors/thirdweb-cli/device-link-error
+PS C:\Users\Osama\OneDrive\Documents\Trust> 
+
 
 ### 3. Configure App
 Create a `.env.local` file in the `chaintrust` folder:
